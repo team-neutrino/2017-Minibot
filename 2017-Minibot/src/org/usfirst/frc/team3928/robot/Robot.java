@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.Joystick;
  * creating this project, you must also update the manifest file in the resource
  * directory.
  */
-public class Robot extends IterativeRobot 
+public class Robot extends IterativeRobot  
 {
 
 	private CANTalon LeftTalon1;
@@ -22,6 +22,8 @@ public class Robot extends IterativeRobot
 	
 	private Joystick JoyLeft;
 	private Joystick JoyRight;
+	
+	private boolean isTankDrive;
 	
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -35,8 +37,15 @@ public class Robot extends IterativeRobot
 		RightTalon1 = new CANTalon(2);
 		RightTalon2 = new CANTalon(3);
 		
+		LeftTalon1.enableBrakeMode(false);
+		LeftTalon2.enableBrakeMode(false);
+		RightTalon1.enableBrakeMode(false);
+		RightTalon2.enableBrakeMode(false);
+		
 		JoyLeft = new Joystick(1);
 		JoyRight = new Joystick(2);
+		
+		isTankDrive = true;
 	}
 
 	/**
@@ -70,16 +79,119 @@ public class Robot extends IterativeRobot
 	 */
 	@Override
 	public void teleopPeriodic() 
-	{
-//		double joyLeftVal = -JoyLeft.getY(); 
-//		double joyRightVal = JoyRight.getY();
-//		
-//		LeftTalon1.set(joyLeftVal);
-//		LeftTalon2.set(joyLeftVal);
-//		
-//		RightTalon1.set(joyRightVal);
-//		RightTalon2.set(joyRightVal);
+	{	
+		if (JoyRight.getRawButton(11))
+		{
+			LeftTalon1.enableBrakeMode(true);
+			LeftTalon2.enableBrakeMode(true);
+			RightTalon1.enableBrakeMode(true);
+			RightTalon2.enableBrakeMode(true);
+			
+			System.out.println("Talons are in break mode");
+		}
+		if (JoyRight.getRawButton(10))
+		{
+			LeftTalon1.enableBrakeMode(false);
+			LeftTalon2.enableBrakeMode(false);
+			RightTalon1.enableBrakeMode(false);
+			RightTalon2.enableBrakeMode(false);
+			
+			System.out.println("Talons are not in break mode");
+		}
 		
+		if (JoyLeft.getRawButton(6))
+		{
+			isTankDrive = true;
+			
+			System.out.println("Is in tank drive mode");
+		}
+		if (JoyLeft.getRawButton(7))
+		{
+			isTankDrive = false;
+			
+			System.out.println("Is in split arcade mode");
+		}
+		
+		if (isTankDrive)
+		{
+			tankDriveWithSquare();
+		}
+		else
+		{
+			simpleArcade();
+		}
+	}
+
+	/**
+	 * This function is called periodically during test mode
+	 */
+	@Override
+	public void testPeriodic() 
+	{
+		
+	}
+	
+	private void simpleArcade()
+	{
+		double leftDriveSet = JoyLeft.getY() - JoyRight.getX();
+		double rightDriveSet = JoyLeft.getY() + JoyRight.getX();
+		
+		if (leftDriveSet > 1)
+		{
+			leftDriveSet = 1;
+		}
+		else if (leftDriveSet < -1)
+		{
+			leftDriveSet = -1;
+		}
+		
+		if (rightDriveSet > 1)
+		{
+			rightDriveSet = 1;
+		}
+		else if (rightDriveSet < -1)
+		{
+			rightDriveSet = -1;
+		}
+		
+		if (leftDriveSet > 0)
+		{
+			LeftTalon1.set(-Math.pow(leftDriveSet, 2));
+			LeftTalon2.set(-Math.pow(leftDriveSet, 2));
+		}
+		else
+		{
+			LeftTalon1.set(Math.pow(leftDriveSet, 2));
+			LeftTalon2.set(Math.pow(leftDriveSet, 2));
+		}
+		
+		if (rightDriveSet > 0)
+		{
+			RightTalon1.set(Math.pow(rightDriveSet, 2));
+			RightTalon2.set(Math.pow(rightDriveSet, 2));
+		}
+		else
+		{
+			RightTalon1.set(-Math.pow(rightDriveSet, 2));
+			RightTalon2.set(-Math.pow(rightDriveSet, 2));
+		}
+		
+	}
+	
+	private void simpleTankDrive()
+	{
+		double joyLeftVal = -JoyLeft.getY(); 
+		double joyRightVal = JoyRight.getY();
+		
+		LeftTalon1.set(joyLeftVal);
+		LeftTalon2.set(joyLeftVal);
+		
+		RightTalon1.set(joyRightVal);
+		RightTalon2.set(joyRightVal);
+	}
+	
+	private void tankDriveWithSquare()
+	{
 		if (JoyLeft.getY() > 0)
 		{
 			LeftTalon1.set(-Math.pow(JoyLeft.getY(), 2));
@@ -101,15 +213,6 @@ public class Robot extends IterativeRobot
 			RightTalon1.set(-Math.pow(JoyRight.getY(), 2));
 			RightTalon2.set(-Math.pow(JoyRight.getY(), 2));
 		}
-	}
-
-	/**
-	 * This function is called periodically during test mode
-	 */
-	@Override
-	public void testPeriodic() 
-	{
-		
 	}
 }
 
