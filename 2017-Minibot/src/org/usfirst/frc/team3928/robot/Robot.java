@@ -2,8 +2,10 @@ package org.usfirst.frc.team3928.robot;
 
 import com.ctre.CANTalon;
 
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Timer;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -22,6 +24,9 @@ public class Robot extends IterativeRobot
 	
 	private Joystick JoyLeft;
 	private Joystick JoyRight;
+	
+	private Encoder EncoderRight;
+	private Encoder EncoderLeft;
 	
 	private boolean isTankDrive;
 	
@@ -62,7 +67,17 @@ public class Robot extends IterativeRobot
 	@Override
 	public void autonomousInit() 
 	{
-
+		LeftTalon1.set(0.37);
+		LeftTalon2.set(0.37);
+		RightTalon1.set(-0.3);
+		RightTalon2.set(-0.3);
+		
+		Timer.delay(2);
+		
+		LeftTalon1.set(0);
+		LeftTalon2.set(0);
+		RightTalon1.set(0);
+		RightTalon2.set(0);
 	}
 
 	/**
@@ -167,13 +182,13 @@ public class Robot extends IterativeRobot
 		
 		if (rightDriveSet > 0)
 		{
-			RightTalon1.set(Math.pow(rightDriveSet, 2));
-			RightTalon2.set(Math.pow(rightDriveSet, 2));
+			RightTalon1.set(Math.pow(rightDriveSet, 4));
+			RightTalon2.set(Math.pow(rightDriveSet, 4));
 		}
 		else
 		{
-			RightTalon1.set(-Math.pow(rightDriveSet, 2));
-			RightTalon2.set(-Math.pow(rightDriveSet, 2));
+			RightTalon1.set(-Math.pow(rightDriveSet, 4));
+			RightTalon2.set(-Math.pow(rightDriveSet, 4));
 		}
 		
 	}
